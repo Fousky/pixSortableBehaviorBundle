@@ -1,5 +1,5 @@
 {
-    "name": "pixassociates/sortable-behavior-bundle",
+    "name": "fousky/pix-sortable-behavior-bundle",
     "type": "symfony-bundle",
     "description": "Provides a way to sort your admin listing",
     "keywords": ["sortable","admin","sonata"],
