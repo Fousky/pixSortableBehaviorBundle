@@ -3,6 +3,12 @@ pixSortableBehaviorBundle
 
 Offers a sortable feature for your Symfony2 admin listing
 
+## Compatibility
+
+This fork is compatible with Symfony 6.4 and Twig 3.x. The original bundle has been updated to work with:
+- Symfony 6.4 (TreeBuilder API compatibility)
+- Twig 3.x (AbstractExtension and TwigFunction compatibility)
+
 ### SonataAdminBundle implementation
 
 The SonataAdminBundle provides a cookbook article here :
@@ -11,7 +17,7 @@ https://github.com/sonata-project/SonataAdminBundle/blob/3.x/docs/cookbook/recip
 
 ### Configuration
 
-By default, this extension works with Doctrine ORM, but you can choose to use Doctrine MongoDB by defining the driver configuration : 
+By default, this extension works with Doctrine ORM, but you can choose to use Doctrine MongoDB by defining the driver configuration :
 
 ``` yaml
 # app/config/config.yml
@@ -25,7 +31,7 @@ pix_sortable_behavior:
     sortable_groups:
         entities:
             AppBundle\Entity\Baz: [ group ]
-            
+
 ```
 
 #### Use a draggable list instead of up/down buttons
@@ -50,7 +56,7 @@ In order to use a draggable list instead of up/down buttons, change the template
             ))
         ;
     }
-```    
+```
 Also include the JavaScript needed for this to work, in your ```theme.yml``` file, add these two lines:
 ```yml
     //...
@@ -85,4 +91,4 @@ pixSortableBehaviorBundle.error
             ))
         ;
     }
-```    
+```

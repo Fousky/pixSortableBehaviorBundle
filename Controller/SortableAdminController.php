@@ -14,7 +14,9 @@ use Doctrine\Common\Util\ClassUtils;
 use Pix\SortableBehaviorBundle\Services\PositionHandler;
 use Sonata\AdminBundle\Controller\CRUDController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class SortableAdminController
@@ -23,21 +25,29 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  */
 class SortableAdminController extends CRUDController
 {
+    private TranslatorInterface $translator;
+    private PositionHandler $positionHandler;
+
+    public function __construct(TranslatorInterface $translator, PositionHandler $positionHandler)
+    {
+        $this->translator = $translator;
+        $this->positionHandler = $positionHandler;
+    }
+
     /**
      * Move element
      *
      * @param string $position
+     * @param Request $request
      *
      * @return RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function moveAction($position)
+    public function moveAction($position, Request $request)
     {
-        $translator = $this->get('translator');
-
         if (!$this->admin->isGranted('EDIT')) {
             $this->addFlash(
                 'sonata_flash_error',
-                $translator->trans('flash_error_no_rights_update_position')
+                $this->translator->trans('flash_error_no_rights_update_position')
             );
 
             return new RedirectResponse($this->admin->generateUrl(
@@ -46,19 +56,17 @@ class SortableAdminController extends CRUDController
             ));
         }
 
-        /** @var PositionHandler $positionHandler */
-        $positionHandler = $this->get('pix_sortable_behavior.position');
-        $object          = $this->admin->getSubject();
+        $object = $this->admin->getSubject();
 
-        $lastPositionNumber = $positionHandler->getLastPosition($object);
-        $newPositionNumber  = $positionHandler->getPosition($object, $position, $lastPositionNumber);
+        $lastPositionNumber = $this->positionHandler->getLastPosition($object);
+        $newPositionNumber  = $this->positionHandler->getPosition($object, $position, $lastPositionNumber);
 
         $accessor = PropertyAccess::createPropertyAccessor();
-        $accessor->setValue($object, $positionHandler->getPositionFieldByEntity($object), $newPositionNumber);
+        $accessor->setValue($object, $this->positionHandler->getPositionFieldByEntity($object), $newPositionNumber);
 
         $this->admin->update($object);
 
-        if ($this->isXmlHttpRequest()) {
+        if ($request->isXmlHttpRequest()) {
             return $this->renderJson(array(
                 'result' => 'ok',
                 'objectId' => $this->admin->getNormalizedIdentifier($object)
@@ -67,7 +75,7 @@ class SortableAdminController extends CRUDController
 
         $this->addFlash(
             'sonata_flash_success',
-            $translator->trans('flash_success_position_updated')
+            $this->translator->trans('flash_success_position_updated')
         );
 
         return new RedirectResponse($this->admin->generateUrl(
